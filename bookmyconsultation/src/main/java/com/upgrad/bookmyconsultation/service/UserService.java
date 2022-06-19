@@ -18,36 +18,40 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class UserService {
-	private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-	@Autowired
-	private PasswordCryptographyProvider passwordCryptographyProvider;
+    @Autowired
+    private PasswordCryptographyProvider passwordCryptographyProvider;
 
 
-	public User register(User user) throws InvalidInputException {
-		ValidationUtils.validate(user);
+    public User register(User user) throws InvalidInputException {
+        ValidationUtils.validate(user);
 
-		user.setCreatedDate(LocalDate.now().toString());
-		encryptPassword(user);
-		userRepository.save(user);
-		return user;
-	}
+        user.setCreatedDate(LocalDate.now().toString());
+        encryptPassword(user);
+        userRepository.save(user);
+        return user;
+    }
 
-	public User getUser(String id) {
-		return Optional.ofNullable(userRepository.findById(id))
-				.get()
-				.orElseThrow(ResourceUnAvailableException::new);
-	}
+    public User getUser(String id) {
+        return Optional.ofNullable(userRepository.findById(id))
+                .get()
+                .orElseThrow(ResourceUnAvailableException::new);
+    }
 
-	//create a method named getAllUsers that returns a List of type User
-		//return all the users from the database
-	
+    //create a method named getAllUsers that returns a List of type User
+    //return all the users from the database
 
-	private void encryptPassword(final User newUser) {
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
-		String password = newUser.getPassword();
-		final String[] encryptedData = passwordCryptographyProvider.encrypt(password);
-		newUser.setSalt(encryptedData[0]);
-		newUser.setPassword(encryptedData[1]);
-	}
+
+    private void encryptPassword(final User newUser) {
+
+        String password = newUser.getPassword();
+        final String[] encryptedData = passwordCryptographyProvider.encrypt(password);
+        newUser.setSalt(encryptedData[0]);
+        newUser.setPassword(encryptedData[1]);
+    }
 }
